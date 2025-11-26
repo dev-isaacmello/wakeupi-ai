@@ -1,8 +1,9 @@
-# SleepArlet - Sistema de Detecção de Sonolência 
+# SleepArlet - Sistema de Detecção de Sonolência
 
 Sistema de monitoramento em tempo real que detecta quando os olhos permanecem fechados por mais de 0.8 segundos, emitindo alertas visuais e sonoros para prevenir acidentes por sonolência.
 
-**Autor:** Isaac Mello
+**Autor:** Isaac Mello  
+**Versão:** 3.0.0
 
 ---
 
@@ -12,10 +13,12 @@ O SleepArlet utiliza visão computacional e deep learning para monitorar o estad
 
 ### Tecnologias Utilizadas
 
+- **FastAPI**: Framework web moderno e rápido
 - **MediaPipe Face Mesh**: Detecção facial e landmarks precisos
 - **OpenCV**: Processamento de imagem e captura de vídeo
-- **TensorFlow/Keras**: Modelos de deep learning para classificação avançada
+- **TensorFlow/Keras**: Modelos de deep learning para classificação avançada (opcional)
 - **NumPy**: Cálculos numéricos otimizados
+- **WebSocket**: Comunicação em tempo real com o frontend
 
 ---
 
@@ -31,10 +34,16 @@ O SleepArlet utiliza visão computacional e deep learning para monitorar o estad
 
 ### Dependências
 
+Todas as dependências estão listadas em `requirements.txt`:
+
 - `opencv-python >= 4.8.0`
 - `mediapipe >= 0.10.0`
 - `numpy >= 1.24.0`
-- `tensorflow >= 2.13.0`
+- `tensorflow >= 2.13.0` (opcional, para deep learning)
+- `fastapi >= 0.100.0`
+- `uvicorn >= 0.22.0`
+- `jinja2 >= 3.1.0`
+- `websockets >= 11.0`
 
 ---
 
@@ -91,29 +100,96 @@ Execute o script principal:
 python main.py
 ```
 
-### Controles
+O servidor será iniciado e você verá:
 
-- **`q`**: Encerrar o programa
+```
+Iniciando SleepArlet v3.0 (Web Interface)...
+Acesse http://localhost:8000 no seu navegador.
+```
 
-### Interface
+### Interface Web
 
-O sistema exibe em tempo real:
+Acesse `http://localhost:8000` no seu navegador para usar a interface web moderna que exibe em tempo real:
 
 - **Status dos olhos**: ABERTO/FECHADO para cada olho
 - **EAR médio**: Eye Aspect Ratio calculado
 - **Taxa de piscadas**: Piscadas por minuto
 - **Total de piscadas**: Contador acumulado
-- **Indicadores visuais**: Círculos coloridos nos olhos (verde=aberto, vermelho=fechado)
+- **Gráfico EAR**: Visualização em tempo real do nível de abertura dos olhos
+- **FPS**: Taxa de quadros por segundo
 
 ### Alerta de Sonolência
 
 Quando os olhos permanecem fechados por **0.8 segundos**, o sistema dispara:
 
-- **Alerta visual**: Borda vermelha pulsante na tela
+- **Alerta visual**: Overlay vermelho pulsante na tela
 - **Alerta sonoro**: Beep do sistema
 - **Mensagem**: "VOCE DORMIU!!!! ACORDE AGORA!!!"
 
 O alerta permanece ativo até que os olhos sejam abertos novamente.
+
+---
+
+## 🏗️ Arquitetura
+
+O projeto segue princípios SOLID e melhores práticas Python, com arquitetura modular e bem organizada:
+
+### Estrutura de Diretórios
+
+```
+wakeupi-ai/
+├── app/                          # Pacote principal da aplicação
+│   ├── __init__.py
+│   ├── main.py                   # Entry point interno
+│   ├── config.py                 # Configurações centralizadas
+│   ├── logger_config.py          # Configuração de logging
+│   │
+│   ├── core/                     # Módulos core
+│   │   ├── __init__.py
+│   │   ├── camera_manager.py     # Gerenciador Singleton de câmera
+│   │   ├── state_manager.py      # Gerenciador de estado da aplicação
+│   │   └── video_processor.py    # Processador de vídeo
+│   │
+│   ├── detection/                 # Módulos de detecção
+│   │   ├── __init__.py
+│   │   ├── eye_detector.py       # Detector de olhos (EAR)
+│   │   └── deep_eye_classifier.py # Classificador de deep learning
+│   │
+│   ├── alert/                     # Sistema de alertas
+│   │   ├── __init__.py
+│   │   ├── alert_system.py        # Lógica de alertas
+│   │   └── alert_renderer.py      # Renderização de alertas
+│   │
+│   ├── rendering/                 # Renderização visual
+│   │   ├── __init__.py
+│   │   └── eye_renderer.py       # Renderizador visual de olhos
+│   │
+│   └── web/                       # Aplicação web
+│       ├── __init__.py
+│       └── web_app.py             # Rotas FastAPI e WebSocket
+│
+├── static/                        # Arquivos estáticos
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       └── dashboard.js
+│
+├── templates/                     # Templates HTML
+│   └── index.html
+│
+├── main.py                       # Entry point principal
+├── requirements.txt              # Dependências
+├── README.md                     # Documentação
+└── AUDITORIA_CHECKLIST.md        # Checklist de auditoria
+```
+
+### Princípios de Design
+
+- **Single Responsibility**: Cada classe tem uma única responsabilidade
+- **Dependency Injection**: Dependências injetadas via construtores
+- **Separation of Concerns**: Renderização separada da lógica de negócio
+- **Singleton Pattern**: `CameraManager` garante uma única instância de câmera
+- **Modularidade**: Código organizado em módulos temáticos
 
 ---
 
@@ -145,8 +221,8 @@ O sistema utiliza um threshold adaptativo baseado no baseline individual:
 Quando habilitado, o sistema utiliza modelos CNN para validação em casos ambíguos:
 
 - Modelo principal: Arquitetura ResNet-like
-- Modelo leve: MobileNet-like para ensemble
 - Ativado apenas quando EAR está próximo do threshold (zona de incerteza)
+- Fallback para heurísticas avançadas quando TensorFlow não está disponível
 
 ### Otimizações de Performance
 
@@ -154,56 +230,61 @@ Quando habilitado, o sistema utiliza modelos CNN para validação em casos ambí
 - Deep learning apenas quando necessário (a cada 0.5s)
 - Modificação in-place de frames para reduzir cópias
 - MediaPipe com refinamento de landmarks para precisão
-
----
-
-## 📁 Estrutura do Projeto
-
-```
-wakeupi-ai/
-├── main.py                  # Script principal e orquestração
-├── eye_detector.py          # Detecção de olhos e cálculo EAR
-├── deep_eye_classifier.py   # Modelos de deep learning
-├── alert_system.py          # Sistema de alertas visuais/sonoros
-├── ui_modern.py             # Interface gráfica moderna
-├── requirements.txt         # Dependências do projeto
-└── README.md               # Documentação
-```
+- WebSocket com atualização a ~30 FPS para economizar banda
 
 ---
 
 ## ⚙️ Configurações
 
-### Parâmetros Ajustáveis
+Todas as configurações estão centralizadas em `app/config.py`:
 
-#### `main.py`
-
-```python
-deep_learning_check_interval = 0.5  # Intervalo para validação DL (segundos)
-```
-
-#### `eye_detector.py`
+### Configurações de Câmera
 
 ```python
-EAR_THRESHOLD = 0.25              # Threshold base para detecção
-EAR_SMOOTHING_FRAMES = 5          # Frames para suavização
+CameraConfig(
+    device_id=0,
+    width=640,
+    height=480,
+    fps=30,
+    buffer_size=1
+)
 ```
 
-#### `alert_system.py`
+### Configurações de Detecção
 
 ```python
-flash_interval = 0.2               # Intervalo entre flashes (segundos)
-beep_interval = 0.5               # Intervalo entre beeps (segundos)
+DetectionConfig(
+    ear_threshold=0.25,
+    ear_smoothing_frames=5,
+    use_deep_learning=False,
+    deep_learning_check_interval=0.5,
+    drowsiness_threshold=0.8,  # segundos
+    blink_debounce=0.15        # segundos
+)
 ```
 
-#### Tempo de Alerta
-
-O tempo para disparar o alerta está definido em `main.py`:
+### Configurações de Alerta
 
 ```python
-if duration > 0.8:  # Threshold de sonolência (segundos)
-    self.alerts.trigger_alert()
+AlertConfig(
+    flash_interval=0.2,      # segundos
+    beep_interval=0.5,       # segundos
+    beep_frequency=1000,     # Hz
+    beep_duration=200        # ms
+)
 ```
+
+### Configurações Web
+
+```python
+WebConfig(
+    host="0.0.0.0",
+    port=8000,
+    websocket_update_interval=0.033  # ~30 FPS
+)
+```
+
+Para modificar configurações, edite `app/config.py` ou crie uma instância customizada de `AppConfig`.
 
 ---
 
@@ -217,12 +298,12 @@ if duration > 0.8:  # Threshold de sonolência (segundos)
 ### Falsos positivos (alerta com olhos abertos)
 
 - **Causa**: Threshold muito baixo ou baseline incorreto
-- **Solução**: Aumente `EAR_THRESHOLD` em `eye_detector.py` (ex: 0.27 ou 0.28)
+- **Solução**: Aumente `ear_threshold` em `app/config.py` (ex: 0.27 ou 0.28)
 
 ### Não detecta olhos fechados
 
 - **Causa**: Threshold muito alto
-- **Solução**: Diminua `EAR_THRESHOLD` em `eye_detector.py` (ex: 0.22 ou 0.23)
+- **Solução**: Diminua `ear_threshold` em `app/config.py` (ex: 0.22 ou 0.23)
 
 ### Webcam não abre
 
@@ -237,9 +318,17 @@ if duration > 0.8:  # Threshold de sonolência (segundos)
 ### FPS muito baixo
 
 - **Causa**: Processamento pesado ou hardware limitado
-- **Solução**: O sistema já está otimizado. Se necessário, desabilite deep learning em `main.py`:
+- **Solução**: O sistema já está otimizado. Se necessário, desabilite deep learning em `app/config.py`:
   ```python
-  self.detector = EyeDetector(use_deep_learning=False)
+  DetectionConfig(use_deep_learning=False)
+  ```
+
+### Erro de importação após reorganização
+
+- **Causa**: Imports antigos ou ambiente virtual não atualizado
+- **Solução**: Certifique-se de estar usando a versão mais recente do código e reinstale as dependências:
+  ```bash
+  pip install -r requirements.txt
   ```
 
 ---
@@ -249,7 +338,21 @@ if duration > 0.8:  # Threshold de sonolência (segundos)
 - **Iluminação**: Mantenha boa iluminação frontal para melhor detecção
 - **Posicionamento**: Mantenha o rosto visível e centralizado na câmera
 - **Ambiente**: Funciona melhor com uma pessoa por vez na frente da câmera
-- **Ajuste fino**: Ajuste o `EAR_THRESHOLD` conforme necessário para seu ambiente
+- **Ajuste fino**: Ajuste as configurações em `app/config.py` conforme necessário para seu ambiente
+- **Logs**: O sistema utiliza logging estruturado. Configure o nível em `app/logger_config.py`
+
+---
+
+## 🔍 Logging
+
+O sistema utiliza logging estruturado configurado em `app/logger_config.py`. Os logs incluem:
+
+- **DEBUG**: Informações detalhadas de debug
+- **INFO**: Informações gerais de operação
+- **WARNING**: Avisos sobre problemas não críticos
+- **ERROR**: Erros que requerem atenção
+
+Para ajustar o nível de log, modifique `setup_logger()` em `app/logger_config.py`.
 
 ---
 
@@ -258,3 +361,5 @@ if duration > 0.8:  # Threshold de sonolência (segundos)
 Este projeto é de uso pessoal e educacional.
 
 **Desenvolvido por Isaac Mello - AI Engineer**
+
+---

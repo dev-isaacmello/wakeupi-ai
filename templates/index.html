@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SleepArlet AI</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Fonts: Inter for UI, JetBrains Mono for Data -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Dynamic Background -->
+    <div class="ambient-layer">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="noise-overlay"></div>
+    </div>
+
+    <div class="app-layout">
+        
+        <!-- Floating Glass Sidebar -->
+        <aside class="glass-panel sidebar">
+            <div class="panel-header">
+                <div class="brand">
+                    <div class="logo-mark">
+                        <div class="logo-pulse"></div>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </div>
+                    <div class="brand-text">
+                        <h1>SleepArlet</h1>
+                        <span class="badge">PRO</span>
+                    </div>
+                </div>
+                <div class="status-indicator active" id="system-status">
+                    <span class="dot"></span> MONITORANDO
+                </div>
+            </div>
+
+            <div class="bento-grid">
+                <!-- Eyes Status Card -->
+                <div class="bento-card eye-card">
+                    <div class="card-label">Status Ocular</div>
+                    
+                    <div class="eye-row">
+                        <div class="eye-info">
+                            <span class="eye-name">Esquerdo</span>
+                            <span class="eye-state" id="left-eye-status">Aberto</span>
+                        </div>
+                        <div class="liquid-bar-track">
+                            <div class="liquid-bar" id="left-eye-bar"></div>
+                        </div>
+                    </div>
+
+                    <div class="eye-row">
+                        <div class="eye-info">
+                            <span class="eye-name">Direito</span>
+                            <span class="eye-state" id="right-eye-status">Aberto</span>
+                        </div>
+                        <div class="liquid-bar-track">
+                            <div class="liquid-bar" id="right-eye-bar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics Row -->
+                <div class="metrics-row">
+                    <div class="bento-card mini-metric">
+                        <div class="metric-icon">⚡</div>
+                        <div class="metric-data">
+                            <span class="value mono" id="blink-rate">--</span>
+                            <span class="label">Piscas/m</span>
+                        </div>
+                    </div>
+                    <div class="bento-card mini-metric">
+                        <div class="metric-icon">∑</div>
+                        <div class="metric-data">
+                            <span class="value mono" id="total-blinks">--</span>
+                            <span class="label">Total</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Card -->
+                <div class="bento-card chart-card">
+                    <div class="card-header-row">
+                        <span class="card-label">Nível de Abertura (EAR)</span>
+                        <span class="live-value mono" id="ear-value">0.00</span>
+                    </div>
+                    <div class="chart-area">
+                        <canvas id="ear-graph"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="footer-info">
+                    <span class="icon-clock"></span>
+                    <span id="clock" class="mono">00:00</span>
+                </div>
+                <div class="fps-badge">
+                    <span id="fps-value" class="mono">60</span> FPS
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Viewport -->
+        <main class="viewport-container">
+            <div class="glass-panel video-wrapper">
+                <img src="/video_feed" id="video-stream" alt="Live Stream">
+                
+                <!-- Smart Overlay -->
+                <div class="smart-overlay">
+                    <div class="corner tl"></div>
+                    <div class="corner tr"></div>
+                    <div class="corner bl"></div>
+                    <div class="corner br"></div>
+                    <div class="scan-line"></div>
+                </div>
+
+                <!-- Critical Alert Modal -->
+                <div class="alert-takeover" id="danger-overlay">
+                    <div class="alert-content-glass">
+                        <div class="alert-ring"></div>
+                        <div class="alert-icon">⚠️</div>
+                        <div class="alert-text">
+                            <h2>ALERTA DE SONOLÊNCIA</h2>
+                            <p>Retome a atenção imediatamente</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
