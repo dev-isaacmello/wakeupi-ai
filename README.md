@@ -52,7 +52,7 @@ Todas as dependências estão listadas em `requirements.txt`:
 ### 1. Clone o repositório
 
 ```bash
-git clone <[repository-url](https://github.com/dev-isaacmello/sleeparlet-ai)>
+git clone https://github.com/dev-isaacmello/sleeparlet-ai
 cd sleeparlet-ai
 ```
 
