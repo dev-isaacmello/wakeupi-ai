@@ -52,8 +52,8 @@ Todas as dependências estão listadas em `requirements.txt`:
 ### 1. Clone o repositório
 
 ```bash
-git clone <repository-url>
-cd wakeupi-ai
+git clone <[repository-url](https://github.com/dev-isaacmello/sleeparlet-ai)>
+cd sleeparlet-ai
 ```
 
 ### 2. Verifique a versão do Python
@@ -137,7 +137,7 @@ O projeto segue princípios SOLID e melhores práticas Python, com arquitetura m
 ### Estrutura de Diretórios
 
 ```
-wakeupi-ai/
+sleeparlet-ai/
 ├── app/                          # Pacote principal da aplicação
 │   ├── __init__.py
 │   ├── main.py                   # Entry point interno
